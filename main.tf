@@ -9,8 +9,8 @@ terraform {
   required_version = ">= 1.2"
 
   backend "s3" {
-    bucket         = "BUCKET_NAME"
-    key            = "KEY_NAME"
+    bucket         = "areyeng-transit-terraform-state"
+    key            = "areyeng-transit/terraform.tfstate"
     region         = "af-south-1"
     encrypt        = true
   }
