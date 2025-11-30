@@ -1,21 +1,55 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.92"
-    }
+resource "aws_cognito_user_pool" "cognito_user_pool" {
+  name = "${var.tag}-user-pool"
+  deletion_protection = true
+
+  schema {
+    name = "Email"
+    attribute_data_type = "String"
+    mutable = true
+    developer_only_attribute = false
   }
 
-  required_version = ">= 1.2"
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
+  }
 
-  backend "s3" {
-    bucket         = "areyeng-transit-terraform-state"
-    key            = "areyeng-transit/terraform.tfstate"
-    region         = "af-south-1"
-    encrypt        = true
+  auto_verified_attributes = [ "email" ]
+
+  password_policy {
+    minimum_length = 8
+    require_lowercase = true
+    require_numbers = true
+    require_uppercase = true
+    require_symbols = true
+    temporary_password_validity_days = 4
+  }
+
+  username_attributes = [ "email" ]
+
+  username_configuration {
+    case_sensitive = true
+  }
+
+  account_recovery_setting {
+    recovery_mechanism {
+      name = "verified_email"
+      priority = 1
+    }
   }
 }
 
-provider "aws" {
-  region = var.region
+resource "aws_cognito_user_pool_client" "cognito_user_pool_client" {
+  name = "${var.tag}-user-pool-client"
+  user_pool_id = aws_cognito_user_pool.cognito_user_pool.id
+  explicit_auth_flows = [ "ALLOW_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH" ]
+  generate_secret = false
+  prevent_user_existence_errors = "LEGACY"
+  refresh_token_validity = 10
+  access_token_validity = 10
+  id_token_validity = 10
+  token_validity_units {
+    access_token = "minutes"
+    id_token = "minutes"
+    refresh_token = "minutes"
+  }
 }
