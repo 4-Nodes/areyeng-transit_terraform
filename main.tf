@@ -35,6 +35,10 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
       priority = 1
     }
   }
+
+  tags = {
+    "projects" = "Test"
+  }
 }
 
 resource "aws_cognito_user_pool_client" "cognito_user_pool_client" {
