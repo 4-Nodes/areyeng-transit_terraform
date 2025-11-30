@@ -1,6 +1,6 @@
 resource "aws_cognito_user_pool" "cognito_user_pool" {
   name = "${var.tag}-user-pool"
-  deletion_protection = [ "ACTIVE" ]
+  deletion_protection = "ACTIVE"
 
   schema {
     name = "Email"
